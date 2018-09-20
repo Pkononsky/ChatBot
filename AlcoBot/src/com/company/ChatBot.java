@@ -1,60 +1,85 @@
 package com.company;
-import java.util.Random;
 
-import java.util.Scanner;
+import javafx.util.Pair;
 
-public class ChatBot {
+import java.util.*;
 
-    private Scanner reader;
-    private String userAnswer;
+public class ChatBot implements Runnable {
+
     private Random rnd;
+    private QuestionRepository repository;
+    private static Queue<MyTupple> userRequest;
+    private static Map<Integer, String> userAnswer;
+    public static Map<Integer, User> usersId;
 
     public ChatBot() {
-        writeHelp();
-        reader = new Scanner(System.in);
         rnd = new Random(System.currentTimeMillis());
+        repository = new QuestionRepository();
+        userRequest = new PriorityQueue<>();
+        userAnswer = new HashMap<>();
+        usersId = new HashMap<>();
     }
 
-    public void conductDialogue() {
-        userAnswer = reader.nextLine().toLowerCase();
-        switch (userAnswer) {
+    public void run() {
+        while (true) {
+            Thread.onSpinWait();
+            if (userRequest.size() != 0) {
+                MyTupple userMessage = userRequest.poll();
+                int id = userMessage.getKey();
+                String message = userMessage.getValue();
+                conductDialogue(id, message);
+            }
+        }
+
+    }
+
+    public static void addToQueue(int id, String message) {
+        if (userAnswer.containsKey(id)) {
+            String checkedAnswer = checkUserAnswer(userAnswer.get(id), message);
+            usersId.get(id).getMessageFromBot(checkedAnswer);
+            userAnswer.remove(id);
+            return;
+        }
+        userRequest.add(new MyTupple(id, message));
+    }
+
+    private void conductDialogue(int id, String message) {
+        switch (message) {
             case ("вопрос"): {
-                playWithUser();
+                Question task = getTask();
+                userAnswer.put(id, task.getAnswer());
+                usersId.get(id).getMessageFromBot(task.getQuestionText());
                 break;
             }
             case ("help"): {
-                writeHelp();
+                usersId.get(id).getMessageFromBot(getHelp());
                 break;
             }
             default: {
-                System.out.println("Неопознанное слово, попробуйте еще раз");
+                usersId.get(id).getMessageFromBot("Неопознанное слово, попробуйте еще раз");
                 break;
             }
         }
     }
 
-    private void playWithUser() {
-        Question task = getTask();
-        System.out.println(task.getQuestionText());
-        userAnswer = reader.nextLine().toLowerCase();
-        if (task.getAnswer().equals(userAnswer)) {
-            System.out.println("Правильно!");
+    private static String checkUserAnswer(String rightAnswer, String userAnswer) {
+        if (rightAnswer.equals(userAnswer)) {
+            return "Правильно!";
         } else {
-            System.out.println("Неправильно :с");
+            return "Неправильно :с";
         }
     }
 
-    public Question getTask() {
-        QuestionRepository repository = new QuestionRepository();
+    private Question getTask() {
         int id = rnd.nextInt(3) + 1;
         return repository.GetById(id);
     }
 
-    private static void writeHelp() {
-        System.out.println("Привет");
-        System.out.println("Я ЧатБот. Пока что я умею только задавать вопросы, но потом буду уметь больше");
-        System.out.println("Чтобы сыграть просто напиши слово \"вопрос\"");
-        System.out.println("Чтобы вывести это сообщение еще раз напиши help");
+    public static String getHelp() {
+        return "Привет\n" +
+                "Я ЧатБот. Пока что я умею только задавать вопросы, но потом буду уметь больше\n" +
+                "Чтобы сыграть просто напиши слово \"вопрос\"\n" +
+                "Чтобы вывести это сообщение еще раз напиши help";
     }
 
 }

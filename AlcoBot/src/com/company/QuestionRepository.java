@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.stream.Collectors;
-
 public class QuestionRepository implements IRepository<Question> {
     private String path = "C:\\Users\\Pkono\\IdeaProjects\\AlcoBot\\src\\com\\company\\questions.json";
     private File file;
