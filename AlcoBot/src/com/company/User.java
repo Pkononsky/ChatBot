@@ -1,30 +1,32 @@
 package com.company;
 
-public class User {
+public class User implements Runnable {
 
     private int id;
     private Interaction interaction;
+    public String lastMessageFromBot;
 
     public User(int id) {
         System.out.println(ChatBot.getHelp());
-        ChatBot.usersId.put(id, this);
+        ChatBot.users.put(id, this);
         interaction = new Interaction();
+        lastMessageFromBot = "";
         this.id = id;
-        start();
     }
 
-    private void start() {
+    public void run() {
         while (true) {
-            sendMessage();
+            Thread.onSpinWait();
+            sendMessage(interaction.getUserAnswer());
         }
     }
 
-    private void sendMessage() {
-        String message = interaction.getUserAnswer();
+    public void sendMessage(String message) {
         ChatBot.addToQueue(id, message);
     }
 
     public void getMessageFromBot(String message) {
-        System.out.println(message);
+        lastMessageFromBot = "Пользователю " + id + "\n" + message;
+        System.out.println("Пользователю " + id + "\n" + message);
     }
 }

@@ -1,68 +1,62 @@
 package com.company;
 
-import javafx.util.Pair;
-
 import java.util.*;
 
 public class ChatBot implements Runnable {
 
     private Random rnd;
     private QuestionRepository repository;
-    private static Queue<MyTupple> userRequest;
+    private static Queue<MyTuple> userRequest;
     private static Map<Integer, String> userAnswer;
-    public static Map<Integer, User> usersId;
+    public static Map<Integer, User> users;
 
     public ChatBot() {
         rnd = new Random(System.currentTimeMillis());
         repository = new QuestionRepository();
         userRequest = new PriorityQueue<>();
         userAnswer = new HashMap<>();
-        usersId = new HashMap<>();
+        users = new HashMap<>();
     }
 
     public void run() {
         while (true) {
             Thread.onSpinWait();
             if (userRequest.size() != 0) {
-                MyTupple userMessage = userRequest.poll();
+                MyTuple userMessage = userRequest.poll();
                 int id = userMessage.getKey();
                 String message = userMessage.getValue();
-                conductDialogue(id, message);
+                users.get(id).getMessageFromBot(conductDialogue(id, message));
             }
         }
-
     }
 
     public static void addToQueue(int id, String message) {
-        if (userAnswer.containsKey(id)) {
-            String checkedAnswer = checkUserAnswer(userAnswer.get(id), message);
-            usersId.get(id).getMessageFromBot(checkedAnswer);
-            userAnswer.remove(id);
-            return;
-        }
-        userRequest.add(new MyTupple(id, message));
+        userRequest.add(new MyTuple(id, message));
     }
 
-    private void conductDialogue(int id, String message) {
+    public String conductDialogue(int id, String message) {
         switch (message) {
             case ("вопрос"): {
                 Question task = getTask();
                 userAnswer.put(id, task.getAnswer());
-                usersId.get(id).getMessageFromBot(task.getQuestionText());
-                break;
+                return task.getQuestionText();
             }
             case ("help"): {
-                usersId.get(id).getMessageFromBot(getHelp());
-                break;
+                return getHelp();
             }
             default: {
-                usersId.get(id).getMessageFromBot("Неопознанное слово, попробуйте еще раз");
-                break;
+                if (userAnswer.containsKey(id)) {
+                    String checkedAnswer = checkUserAnswer(userAnswer.get(id), message);
+                    userAnswer.remove(id);
+                    return checkedAnswer;
+                } else {
+                    return "Неопознанное слово, попробуйте еще раз";
+                }
             }
         }
     }
 
-    private static String checkUserAnswer(String rightAnswer, String userAnswer) {
+    public static String checkUserAnswer(String rightAnswer, String userAnswer) {
         if (rightAnswer.equals(userAnswer)) {
             return "Правильно!";
         } else {

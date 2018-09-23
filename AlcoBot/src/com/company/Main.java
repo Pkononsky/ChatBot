@@ -7,6 +7,8 @@ public class Main {
         botThread = new ChatBot();
         Thread bot = new Thread(botThread);
         bot.start();
-        User user1 = new User(1);
+        User userThread1 = new User(1);
+        Thread user1 = new Thread(userThread1);
+        user1.start();
     }
 }
