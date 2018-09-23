@@ -45,7 +45,7 @@ public class ChatBot {
     }
 
     public Question getTask() {
-        QuestionRepository repository = new QuestionRepository();
+        GenericRepository<Question> repository = new GenericRepository<Question>(Question.class);
         int id = rnd.nextInt(3) + 1;
         return repository.GetById(id);
     }
