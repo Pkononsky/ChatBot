@@ -1,60 +1,79 @@
 package com.company;
-import java.util.Random;
 
-import java.util.Scanner;
+import java.util.*;
 
-public class ChatBot {
+public class ChatBot implements Runnable {
 
-    private Scanner reader;
-    private String userAnswer;
     private Random rnd;
+    private GenericRepository<Question> repository;
+    private static Queue<MyTuple> userRequest;
+    private static Map<Integer, String> userAnswer;
+    public static Map<Integer, User> users;
 
     public ChatBot() {
-        writeHelp();
-        reader = new Scanner(System.in);
         rnd = new Random(System.currentTimeMillis());
+        repository = new GenericRepository<>(Question.class);
+        userRequest = new PriorityQueue<>();
+        userAnswer = new HashMap<>();
+        users = new HashMap<>();
     }
 
-    public void conductDialogue() {
-        userAnswer = reader.nextLine().toLowerCase();
-        switch (userAnswer) {
+    public void run() {
+        while (true) {
+            Thread.onSpinWait();
+            if (userRequest.size() != 0) {
+                MyTuple userMessage = userRequest.poll();
+                int id = userMessage.getKey();
+                String message = userMessage.getValue();
+                users.get(id).getMessageFromBot(conductDialogue(id, message));
+            }
+        }
+    }
+
+    public static void addToQueue(int id, String message) {
+        userRequest.add(new MyTuple(id, message));
+    }
+
+    public String conductDialogue(int id, String message) {
+        switch (message) {
             case ("вопрос"): {
-                playWithUser();
-                break;
+                Question task = getTask();
+                userAnswer.put(id, task.getAnswer());
+                return task.getQuestionText();
             }
             case ("help"): {
-                writeHelp();
-                break;
+                return getHelp();
             }
             default: {
-                System.out.println("Неопознанное слово, попробуйте еще раз");
-                break;
+                if (userAnswer.containsKey(id)) {
+                    String checkedAnswer = checkUserAnswer(userAnswer.get(id), message);
+                    userAnswer.remove(id);
+                    return checkedAnswer;
+                } else {
+                    return "Неопознанное слово, попробуйте еще раз";
+                }
             }
         }
     }
 
-    private void playWithUser() {
-        Question task = getTask();
-        System.out.println(task.getQuestionText());
-        userAnswer = reader.nextLine().toLowerCase();
-        if (task.getAnswer().equals(userAnswer)) {
-            System.out.println("Правильно!");
+    public static String checkUserAnswer(String rightAnswer, String userAnswer) {
+        if (rightAnswer.equals(userAnswer)) {
+            return "Правильно!";
         } else {
-            System.out.println("Неправильно :с");
+            return "Неправильно :с";
         }
     }
 
-    public Question getTask() {
-        GenericRepository<Question> repository = new GenericRepository<Question>(Question.class);
+    private Question getTask() {
         int id = rnd.nextInt(3) + 1;
         return repository.getById(id);
     }
 
-    private static void writeHelp() {
-        System.out.println("Привет");
-        System.out.println("Я ЧатБот. Пока что я умею только задавать вопросы, но потом буду уметь больше");
-        System.out.println("Чтобы сыграть просто напиши слово \"вопрос\"");
-        System.out.println("Чтобы вывести это сообщение еще раз напиши help");
+    public static String getHelp() {
+        return "Привет\n" +
+                "Я ЧатБот. Пока что я умею только задавать вопросы, но потом буду уметь больше\n" +
+                "Чтобы сыграть просто напиши слово \"вопрос\"\n" +
+                "Чтобы вывести это сообщение еще раз напиши help";
     }
 
 }
