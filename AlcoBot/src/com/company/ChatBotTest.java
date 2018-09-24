@@ -1,9 +1,7 @@
 package com.company;
 
-import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ChatBotTest extends TestCase {
@@ -17,23 +15,23 @@ public class ChatBotTest extends TestCase {
     public void testRemoveQuestion() {
         GenericRepository<Question> rep = new GenericRepository<Question>(Question.class);
         Question question = new Question("text", "answer");
-        rep.Add(question);
-        List<Question> list = rep.GetAll();
+        rep.add(question);
+        List<Question> list = rep.getAll();
         int sizeBefore = list.size();
-        rep.Remove(question);
-        list = rep.GetAll();
+        rep.remove(question);
+        list = rep.getAll();
         assertEquals(sizeBefore - 1, list.size());
     }
 
     public void testAddQuestion() {
         GenericRepository<Question> rep = new GenericRepository<>(Question.class);
-        List<Question> list = rep.GetAll();
+        List<Question> list = rep.getAll();
         int sizeBefore = list.size();
         Question question = new Question("text", "answer");
-        rep.Add(question);
-        list = rep.GetAll();
+        rep.add(question);
+        list = rep.getAll();
         assertEquals(sizeBefore + 1, list.size());
-        rep.Remove(question);
+        rep.remove(question);
     }
 
 }

@@ -13,19 +13,19 @@ public class GenericRepository<T> implements IRepository<T> {
     }
 
     @Override
-    public List<T> GetAll() {
+    public List<T> getAll() {
         Session session = HibernateUtil.getInstance().getSession();
         return (List<T>) session.createQuery("FROM "+cls.getSimpleName()).list();
      }
 
     @Override
-    public T GetById(long id) {
+    public T getById(long id) {
         Session session = HibernateUtil.getInstance().getSession();
         return session.get(cls, id);
     }
 
     @Override
-    public void Add(T item) {
+    public void add(T item) {
         Session session = HibernateUtil.getInstance().getSession();
         Transaction tx = session.beginTransaction();
         session.persist(item);
@@ -33,7 +33,7 @@ public class GenericRepository<T> implements IRepository<T> {
     }
 
     @Override
-    public void Remove(T item) {
+    public void remove(T item) {
         Session session = HibernateUtil.getInstance().getSession();
         Transaction tx = session.beginTransaction();
         session.remove(item);
@@ -41,7 +41,7 @@ public class GenericRepository<T> implements IRepository<T> {
      }
 
     @Override
-    public void Update(T item) {
+    public void update(T item) {
         Session session = HibernateUtil.getInstance().getSession();
         Transaction tx = session.beginTransaction();
         session.update(item);
