@@ -1,12 +1,9 @@
 package com.company;
 
-import java.util.List;
-
 public class Main {
     static ChatBot botThread;
 
     public static void main(String[] args) {
-
         botThread = new ChatBot();
         Thread bot = new Thread(botThread);
         bot.start();

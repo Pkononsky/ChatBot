@@ -1,9 +1,17 @@
 package com.company;
 
 import junit.framework.TestCase;
-import java.util.List;
+
+import java.util.ArrayList;
+
 public class ChatBotTest extends TestCase {
-    ChatBot bot = new ChatBot();
+    ChatBot bot;
+    Thread botThread;
+    public ChatBotTest(){
+        bot = new ChatBot();
+        botThread = new Thread(bot);
+        botThread.start();
+    }
 
     public void testConductDialogueQuestion() {
         String question = bot.conductDialogue(1, "вопрос");
@@ -27,12 +35,10 @@ public class ChatBotTest extends TestCase {
 
     public void testOneUser() {
         try {
-            Thread botThread = new Thread(bot);
-            botThread.start();
-            User user = new User(1);
+            User user = new User(0);
             user.sendMessage("вопрос");
-            Thread.sleep(1000);
-            System.out.println(user.lastMessageFromBot);
+            Thread.sleep(4000);
+            System.out.println(user.lastMessageFromBot + "\nПользователю " + 0);
             assert (true);
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -42,15 +48,13 @@ public class ChatBotTest extends TestCase {
 
     public void testTwoUser() {
         try {
-            Thread botThread = new Thread(bot);
-            botThread.start();
             User user1 = new User(1);
             User user2 = new User(2);
             user1.sendMessage("вопрос");
             user2.sendMessage("help");
-            Thread.sleep(1000);
-            System.out.println(user1.lastMessageFromBot);
-            System.out.println(user2.lastMessageFromBot);
+            Thread.sleep(4000);
+            System.out.println(user1.lastMessageFromBot + "\nПользователю " + 1);
+            System.out.println(user2.lastMessageFromBot + "\nПользователю " + 2);
             assert (true);
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -58,29 +62,19 @@ public class ChatBotTest extends TestCase {
         }
     }
 
-    public void testManyUser() {
+    public void testOneHundredUser() {
         try {
-            Thread botThread = new Thread(bot);
-            botThread.start();
-            User user1 = new User(1);
-            User user2 = new User(2);
-            User user3 = new User(3);
-            User user4 = new User(4);
-            User user5 = new User(5);
-            User user6 = new User(6);
-            user1.sendMessage("вопрос");
-            user2.sendMessage("help");
-            user3.sendMessage("qwe");
-            user4.sendMessage("вопрос");
-            user5.sendMessage("qwe");
-            user6.sendMessage("вопрос");
-            Thread.sleep(1000);
-            System.out.println(user1.lastMessageFromBot);
-            System.out.println(user2.lastMessageFromBot);
-            System.out.println(user3.lastMessageFromBot);
-            System.out.println(user4.lastMessageFromBot);
-            System.out.println(user5.lastMessageFromBot);
-            System.out.println(user6.lastMessageFromBot);
+            ArrayList<User> users = new ArrayList<>();
+            for (int i = 0; i < 100; i++){
+                users.add(new User(i));
+            }
+            for (int i = 0; i < users.size(); i++){
+                users.get(i).sendMessage("вопрос");
+            }
+            Thread.sleep(4000);
+            for (int i = 0; i < users.size(); i++){
+                System.out.println(users.get(i).lastMessageFromBot + "\nПользователю " + i);
+            }
             assert (true);
         } catch (Exception e) {
             System.out.println(e.getMessage());
