@@ -9,7 +9,7 @@ project for java course
 4) Поменять имена методов - с маленькой буквы
 5) Gson сделать один раз
 6) Путь до файла - убрать и сделать по другому
-7)try {...} catch (Exception e) e.printStackTrace - так делать ненадо
+7) try {...} catch (Exception e) e.printStackTrace - так делать ненадо
 8) ArrayList<>
 9) return null - можно просто вернуть пустой массив
 10) map
