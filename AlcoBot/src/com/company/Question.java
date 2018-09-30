@@ -1,7 +1,7 @@
 package com.company;
 
 public class Question {
-    private Long Id;
+    private int Id;
     private String QuestionText;
     private String Answer;
 
@@ -10,11 +10,11 @@ public class Question {
         this.QuestionText = questionText;
     }
 
-    public Long getId() {
+    public int getId() {
         return Id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         Id = id;
     }
 
