@@ -7,7 +7,6 @@ public class User implements Runnable {
     public String lastMessageFromBot;
 
     public User(int id) {
-        System.out.println(ChatBot.getHelp());
         ChatBot.users.put(id, this);
         interaction = new Interaction();
         lastMessageFromBot = "";
@@ -15,8 +14,8 @@ public class User implements Runnable {
     }
 
     public void run() {
+        sendMessage("help");
         while (true) {
-            Thread.onSpinWait();
             sendMessage(interaction.getUserAnswer());
         }
     }
@@ -26,7 +25,7 @@ public class User implements Runnable {
     }
 
     public void getMessageFromBot(String message) {
-        lastMessageFromBot = "Пользователю " + id + "\n" + message;
-        System.out.println("Пользователю " + id + "\n" + message);
+        lastMessageFromBot = message;
+        System.out.println(message);
     }
 }

@@ -4,14 +4,12 @@ import java.util.*;
 
 public class ChatBot implements Runnable {
 
-    private Random rnd;
     private GenericRepository<Question> repository;
     private static Queue<MyTuple> userRequest;
     private static Map<Integer, String> userAnswer;
     public static Map<Integer, User> users;
 
     public ChatBot() {
-        rnd = new Random(System.currentTimeMillis());
         repository = new GenericRepository<>(Question.class);
         userRequest = new PriorityQueue<>();
         userAnswer = new HashMap<>();
@@ -20,7 +18,6 @@ public class ChatBot implements Runnable {
 
     public void run() {
         while (true) {
-            Thread.onSpinWait();
             if (userRequest.size() != 0) {
                 MyTuple userMessage = userRequest.poll();
                 int id = userMessage.getKey();
@@ -65,8 +62,7 @@ public class ChatBot implements Runnable {
     }
 
     private Question getTask() {
-        int id = rnd.nextInt(3) + 1;
-        return repository.getById(id);
+        return repository.getById(1);
     }
 
     public static String getHelp() {
