@@ -1,84 +1,58 @@
 package com.company;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
+import java.io.*;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.stream.Collectors;
+import java.util.Random;
 
 public class QuestionRepository implements IRepository<Question> {
-    private String path = "C:\\Users\\Pkono\\IdeaProjects\\AlcoBot\\src\\com\\company\\questions.json";
-    private File file;
+
+    private Random rnd;
+    private String path;
+    private ArrayList<Question> questions;
 
     public QuestionRepository() {
-        file = new File(path);
+        rnd = new Random(System.currentTimeMillis());
+        questions = new ArrayList<>();
+        File file = new File("Questions");
+        path = Paths.get(file.getAbsolutePath()).getParent() + "\\src\\Questions";
+        GetAll();
     }
 
     @Override
-    public Question GetById(long id) {
-        ArrayList<Question> questions = GetAll();
-        return questions.stream().filter(x -> x.getId() == id).findFirst().get();
-    }
-
-    @Override
-    public ArrayList<Question> GetAll() {
-        try {
-            String str = readFile(path, Charset.defaultCharset());
-            Gson gson = new GsonBuilder().create();
-            Question[] questions = gson.fromJson(str, Question[].class);
-            if (questions == null)
-                return new ArrayList<Question>();
-            return new ArrayList<Question>(Arrays.asList(questions));
+    public void GetAll() {
+         try {
+            FileInputStream fIStream = new FileInputStream(path);
+            BufferedReader br = new BufferedReader(new InputStreamReader(fIStream));
+            String strLine;
+            while ((strLine = br.readLine()) != null) {
+                String[] splited = strLine.split(":");
+                Question question = new Question(splited[1], splited[2]);
+                questions.add(question);
+                question.setId(Integer.parseInt(splited[0]));
+            }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Ошибка чтения файла");
         }
-        return null;
     }
 
-    static String readFile(String path, Charset encoding)
-            throws IOException {
-        byte[] encoded = Files.readAllBytes(Paths.get(path));
-        return new String(encoded, encoding);
+    @Override
+    public Question GetById(int id) {
+        return questions.get(id);
+    }
+
+    public Question getRandomQuestion() {
+        int randomNumber = rnd.nextInt(questions.size());
+        return questions.get(randomNumber);
     }
 
     @Override
     public void Add(Question item) {
-        ArrayList<Question> questions = GetAll();
-        long maxId = questions.stream().max(Comparator.comparing(Question::getId)).get().getId();
-        item.setId(maxId + 1);
-        questions.add(item);
-        Gson gson = new GsonBuilder().create();
-        String json = gson.toJson(questions);
         try {
-            FileWriter fooWriter = new FileWriter(file, false);
-            fooWriter.write(json);
-            fooWriter.close();
+            FileWriter fileWriter = new FileWriter(path);
+            fileWriter.write(item.getQuestionText()+"-"+item.getAnswer());
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Ошибка записи в файл");
         }
     }
-
-    @Override
-    public void Remove(Question item) {
-        ArrayList<Question> questions = GetAll();
-        questions.removeIf(x -> x.getId().equals(item.getId()));
-        Gson gson = new GsonBuilder().create();
-        String json = gson.toJson(questions);
-        try {
-            FileWriter fooWriter = new FileWriter(file, false);
-            fooWriter.write(json);
-            fooWriter.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
 }
