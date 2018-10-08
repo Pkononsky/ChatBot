@@ -62,7 +62,9 @@ public class ChatBot implements Runnable {
     }
 
     private Question getTask() {
-        return repository.getById(1);
+        int totalCount = repository.getAll().size();
+        Random random = new Random();
+        return repository.getById(random.nextInt(totalCount));
     }
 
     public static String getHelp() {
