@@ -68,11 +68,8 @@ public class ChatBot implements Runnable {
     }
 
     private Question getTask() {
-        //Возможно в репозитории стоит сделать метод, который будет выдавать число,
-        //либо вообще унести логику вынимания рандомной записи в репозиторий
-        int totalCount = repository.getAll().size();
-        Random random = new Random();
-        return repository.getById(random.nextInt(totalCount));
+
+        return repository.getRandom();
     }
 
     public static String getHelp() {
