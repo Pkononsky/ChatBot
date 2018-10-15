@@ -18,6 +18,16 @@ public class GenericRepository<T> implements IRepository<T> {
         return (List<T>) session.createQuery("FROM " + cls.getSimpleName()).list();
     }
 
+    public long getCount(){
+        Session session = HibernateUtil.getInstance().getSession();
+        return (long) session.createQuery("SELECT COUNT(*) FROM " + cls.getSimpleName()).list().get(0);
+    }
+
+    public T getRandom(){
+        Session session = HibernateUtil.getInstance().getSession();
+        return (T) session.createQuery("FROM " +cls.getSimpleName() +" ORDER BY RANDOM()").list().get(0);
+    }
+
     @Override
     public T getById(long id) {
         Session session = HibernateUtil.getInstance().getSession();
