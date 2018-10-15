@@ -2,33 +2,39 @@ package com.company;
 
 import java.util.*;
 
+//TODO Вопрос-ответ без поддержки состояния не подходят.
+// Надо либо доточить идею, либо взять другую.
 public class ChatBot implements Runnable {
 
     private GenericRepository<Question> repository;
-    private static Queue<MyTuple> userRequest;
-    private static Map<Integer, String> userAnswer;
+    //Это статичных коллекций быть не должно
+    private static Queue<UserRequest> userRequest;
+    //Это статичных коллекций быть не должно
+    private Map<Integer, String> userAnswer;
+    //Это статичных коллекций быть не должно
     public static Map<Integer, User> users;
 
     public ChatBot() {
         repository = new GenericRepository<>(Question.class);
+        //Это не потокобезопасная коллекций
         userRequest = new PriorityQueue<>();
         userAnswer = new HashMap<>();
+        //Это не потокобезопасная коллекций
         users = new HashMap<>();
     }
 
     public void run() {
         while (true) {
             if (userRequest.size() != 0) {
-                MyTuple userMessage = userRequest.poll();
-                int id = userMessage.getKey();
-                String message = userMessage.getValue();
-                users.get(id).getMessageFromBot(conductDialogue(id, message));
+                UserRequest userMessage = userRequest.poll();
+                User user = users.get(userMessage.Id);
+                user.getMessageFromBot(conductDialogue(userMessage.Id, userMessage.Message));
             }
         }
     }
 
     public static void addToQueue(int id, String message) {
-        userRequest.add(new MyTuple(id, message));
+        userRequest.add(new UserRequest(id, message));
     }
 
     public String conductDialogue(int id, String message) {
@@ -62,6 +68,8 @@ public class ChatBot implements Runnable {
     }
 
     private Question getTask() {
+        //Возможно в репозитории стоит сделать метод, который будет выдавать число,
+        //либо вообще унести логику вынимания рандомной записи в репозиторий
         int totalCount = repository.getAll().size();
         Random random = new Random();
         return repository.getById(random.nextInt(totalCount));
