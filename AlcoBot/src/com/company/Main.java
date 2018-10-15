@@ -1,14 +1,14 @@
 package com.company;
 
 public class Main {
-    static ChatBot botThread;
-
     public static void main(String[] args) {
-        botThread = new ChatBot();
-        Thread bot = new Thread(botThread);
-        bot.start();
-        User userThread1 = new User(1);
-        Thread user1 = new Thread(userThread1);
-        user1.start();
+        ChatBot bot = new ChatBot();
+        Thread botThread = new Thread(bot);
+        botThread.start();
+        User user = new User(1);
+        Thread userThread = new Thread(user);
+        userThread.start();
+
+        //TODO А где же остановка тредов?!
     }
 }
