@@ -1,12 +1,14 @@
 package com.company;
 
 public class UserRequest implements Comparable<UserRequest> {
-    public final Integer Id;
+    public final Long Id;
     public final String Message;
+    public User user;
 
-    public UserRequest(int id, String Message) {
+    public UserRequest(long id, String Message, User user) {
         this.Id = id;
         this.Message = Message;
+        this.user= user;
     }
 
     @Override

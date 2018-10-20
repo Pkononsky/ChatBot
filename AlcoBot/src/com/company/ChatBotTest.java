@@ -35,8 +35,8 @@ public class ChatBotTest extends TestCase {
 
     public void testOneUser() {
         try {
-            User user = new User(0);
-            user.sendMessage("вопрос");
+            User user = new User((long)0);
+            bot.addToQueue(0, "вопрос", user);
             Thread.sleep(4000);
             System.out.println(user.lastMessageFromBot + "\nПользователю " + 0);
             assert (true);
@@ -48,10 +48,10 @@ public class ChatBotTest extends TestCase {
 
     public void testTwoUser() {
         try {
-            User user1 = new User(1);
-            User user2 = new User(2);
-            user1.sendMessage("вопрос");
-            user2.sendMessage("help");
+            User user1 = new User((long)1);
+            User user2 = new User((long)2);
+            bot.addToQueue(1, "вопрос", user1);
+            bot.addToQueue(2, "help", user2);
             Thread.sleep(4000);
             System.out.println(user1.lastMessageFromBot + "\nПользователю " + 1);
             System.out.println(user2.lastMessageFromBot + "\nПользователю " + 2);
@@ -66,10 +66,10 @@ public class ChatBotTest extends TestCase {
         try {
             ArrayList<User> users = new ArrayList<>();
             for (int i = 0; i < 100; i++){
-                users.add(new User(i));
+                users.add(new User((long)i));
             }
             for (int i = 0; i < users.size(); i++){
-                users.get(i).sendMessage("вопрос");
+                bot.addToQueue(i, "вопрос", users.get(i));
             }
             Thread.sleep(4000);
             for (int i = 0; i < users.size(); i++){

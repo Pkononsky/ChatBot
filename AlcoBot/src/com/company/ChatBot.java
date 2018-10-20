@@ -7,37 +7,29 @@ import java.util.*;
 public class ChatBot implements Runnable {
 
     private GenericRepository<Question> repository;
-    //Это статичных коллекций быть не должно
-    private static Queue<UserRequest> userRequest;
-    //Это статичных коллекций быть не должно
-    private Map<Integer, String> userAnswer;
-    //Это статичных коллекций быть не должно
-    public static Map<Integer, User> users;
+    private Queue<UserRequest> userRequest;
+    private Map<Long, String> userAnswer;
 
     public ChatBot() {
         repository = new GenericRepository<>(Question.class);
-        //Это не потокобезопасная коллекций
         userRequest = new PriorityQueue<>();
         userAnswer = new HashMap<>();
-        //Это не потокобезопасная коллекций
-        users = new HashMap<>();
     }
 
     public void run() {
         while (true) {
             if (userRequest.size() != 0) {
                 UserRequest userMessage = userRequest.poll();
-                User user = users.get(userMessage.Id);
-                user.getMessageFromBot(conductDialogue(userMessage.Id, userMessage.Message));
+                userMessage.user.getMessageFromBot(conductDialogue(userMessage.Id, userMessage.Message));
             }
         }
     }
 
-    public static void addToQueue(int id, String message) {
-        userRequest.add(new UserRequest(id, message));
+    public void addToQueue(long id, String message, User user) {
+        userRequest.add(new UserRequest(id, message, user));
     }
 
-    public String conductDialogue(int id, String message) {
+    public String conductDialogue(long id, String message) {
         switch (message) {
             case ("вопрос"): {
                 Question task = getTask();
@@ -68,7 +60,6 @@ public class ChatBot implements Runnable {
     }
 
     private Question getTask() {
-
         return repository.getRandom();
     }
 
@@ -80,4 +71,3 @@ public class ChatBot implements Runnable {
     }
 
 }
-
