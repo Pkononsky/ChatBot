@@ -1,15 +1,30 @@
 package com.company;
 
+import javax.persistence.Id;
+import java.util.Scanner;
+
 public class Main {
+
     public static void main(String[] args) {
         ChatBot bot = new ChatBot();
-        GenericRepository repo = new GenericRepository(Question.class);
         Thread botThread = new Thread(bot);
         botThread.start();
-        User user = new User(1);
-        Thread userThread = new Thread(user);
-        userThread.start();
+        UserRepository<User> userRepository = new UserRepository<>(User.class);
+        Scanner IdScanner = new Scanner(System.in);
 
-        //TODO А где же остановка тредов?!
+        //userRepository.remove(userRepository.getById(1));
+        //userRepository.remove(userRepository.getById(2));
+        //userRepository.add(new User((long)1));
+        //userRepository.add(new User((long)2));
+
+        while (true){
+            long id = IdScanner.nextLong();
+            if (id == -1)
+                break;
+            User user = userRepository.getById(id);
+            bot.addToQueue(user.getId(), user.getMessageToBot(), user);
+            userRepository.update(user);
+        }
+        botThread.stop();
     }
 }
