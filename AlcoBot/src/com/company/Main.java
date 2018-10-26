@@ -1,30 +1,37 @@
 package com.company;
-
-import javax.persistence.Id;
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
 
-    public static void main(String[] args) {
-        ChatBot bot = new ChatBot();
-        Thread botThread = new Thread(bot);
-        botThread.start();
-        UserRepository<User> userRepository = new UserRepository<>(User.class);
-        Scanner IdScanner = new Scanner(System.in);
-
-        //userRepository.remove(userRepository.getById(1));
-        //userRepository.remove(userRepository.getById(2));
-        //userRepository.add(new User((long)1));
-        //userRepository.add(new User((long)2));
+    public static void main(String[] args){
+        Scanner sc = new Scanner(System.in);
+        Bot bot = null;
+        Map<String, Bot> profileBot = new HashMap<>();
+        List<Thread> threads = new ArrayList<>();
 
         while (true){
-            long id = IdScanner.nextLong();
-            if (id == -1)
+            System.out.println("Введи логин");
+            String login = sc.nextLine();
+            if (!profileBot.containsKey(login)){
+                bot = new Bot(login);
+                Thread botThread = new Thread(bot);
+                botThread.start();
+                profileBot.put(login, bot);
+                threads.add(botThread);
+            }
+
+            System.out.println("Введи сообщение");
+            String message = sc.nextLine();
+            if (message == "stop"){
                 break;
-            User user = userRepository.getById(id);
-            bot.addToQueue(user.getId(), user.getMessageToBot(), user);
-            userRepository.update(user);
+            }
+            profileBot.get(login).addToQueue(message);
+
         }
-        botThread.stop();
+
+        for (Thread thread : threads){
+            thread.stop();
+        }
+
     }
 }
